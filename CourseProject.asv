@@ -31,6 +31,6 @@ for i = 4:251,
         temp = [temp i];
     end
 end
-countries = NeonatalMortality(temp,'DataSource')
-EditNM = NeonatalMortality;
-EditNM(temp,:) = [];
+countries = NeonatalMortality(temp,'DataSource');
+EditNM = NeonatalMortality
+EditNM
