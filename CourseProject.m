@@ -40,6 +40,23 @@ EditNM(temp,:) = [];
 %Remove the omitted countries from the other datasets
 EditSan = SanitationData;
 [m, n] = size(EditSan);
+for i = 1:251,
+	for j = 1:23,
+        if strcmp(EditSan{i,'DataSource'},countries{j,'DataSource'})==1,
+            countries{j,'DataSource'}
+            EditSan{i,'DataSource'}
+            EditSan(i,:) = [];
+        end
+        [m,n] = size(EditSan);
+    end
+end
+%for some reason, American Samoa will not delete in the above for loop nor
+%in a for loop that searches only for the string 'American Samoa' (copy and
+%pasted from the EditSan table!).
+%EditSan(12,:) = [];
+%%
+EditPop = PopulationData;
+[m, n] = size(EditPop);
 for i = 1:23,
 	for j = 1:m,
         if strcmp(SanitationData{j,'DataSource'},countries{i,'DataSource'})==1,
@@ -51,11 +68,6 @@ for i = 1:23,
     end
     i
 end
-%for some reason, American Samoa will not delete in the above for loop nor
-%in a for loop that searches only for the string 'American Samoa' (copy and
-%pasted from the EditSan table!).
-EditSan(12,:) = [];
-        
 %%   
 for i = 1:229,
     if strcmp(EditNM{i,'DataSource'},EditSan{i,'DataSource'})==0
