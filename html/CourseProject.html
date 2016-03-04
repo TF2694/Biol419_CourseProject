@@ -1,0 +1,314 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>CourseProject</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-03-03"><meta name="DC.source" content="CourseProject.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="comment">%Tamar Feldman, Biol419, Interim Report 03.03.16</span>
+
+<span class="comment">%I pulled the datasets I want to work with into Matlab.  There were</span>
+<span class="comment">%immediately apparent issues with the data, some of which I have already</span>
+<span class="comment">%addressed. Firstly, the World Bank includes data for groupings of</span>
+<span class="comment">%countries without a simple way of sorting them from the list of countries.</span>
+<span class="comment">% I removed these by hand as well as the empty rows for certain small</span>
+<span class="comment">% states like Aruba and American Samoa.  Secondly, there are large gaps in</span>
+<span class="comment">% the data that vary between countries and between datasets.  I have not</span>
+<span class="comment">% yet decided how to handle these discrepencies without misrepresenting the</span>
+<span class="comment">% data.  Currently, I am considering choosing a 5 year range to average</span>
+<span class="comment">% available values over. I could also try to identify which years have the</span>
+<span class="comment">% most complete data across all the indicators and include only those years</span>
+<span class="comment">% in my analysis.  Another approach would be to identify countries that</span>
+<span class="comment">% have the most complete data for analysis. This approach would need to be</span>
+<span class="comment">% done carefully because countries with better health usually have the most</span>
+<span class="comment">% complete data.  I might loose subtleties in the data if the countries</span>
+<span class="comment">% aren't representative of the distribution in each indicator.</span>
+
+<span class="comment">%I chose to visualize the data by simply creating histograms for the data</span>
+<span class="comment">%in 2010 to get a prelimary feel for the distributions.  I would like my</span>
+<span class="comment">%analysis to either span several years or look at how change in the</span>
+<span class="comment">%indicators from year to year is reflected in change in neonatal mortality.</span>
+<span class="comment">%I will also need to consider how indicators with clear outliers, like</span>
+<span class="comment">%population density and GNI, should be analyzed.  There might also be some</span>
+<span class="comment">%interesting geographical trends that I would like to explore. I think that</span>
+<span class="comment">%I might find some indicators to be better predictors in one region versus</span>
+<span class="comment">%another.  Displaying the data by region could yield insight on this.</span>
+
+<span class="comment">%Reading in data http://data.worldbank.org/indicator/SH.STA.ACSN</span>
+SanitationData = readtable(<span class="string">'SanitationData.xls'</span>);
+<span class="comment">%http://data.worldbank.org/indicator/SE.ADT.LITR.ZS</span>
+LiteracyRate = readtable(<span class="string">'LiteractyRate.xls'</span>);
+<span class="comment">%http://data.worldbank.org/indicator/SP.POP.TOTL</span>
+PopulationData = readtable(<span class="string">'PopulationData.xls'</span>);
+<span class="comment">%http://data.worldbank.org/indicator/NY.GNP.ATLS.CD</span>
+GniData = readtable(<span class="string">'GNIData.xls'</span>);
+<span class="comment">%http://data.worldbank.org/indicator/SH.DYN.NMRT</span>
+NeonatalMortality = readtable(<span class="string">'NeonatalMortality.xls'</span>);
+WomenEmployed = readtable(<span class="string">'WomenEmployed.xls'</span>);
+PhysDensity = readtable(<span class="string">'PhysicianDensity.xls'</span>);
+NursDensity = readtable(<span class="string">'NursesDensity.xls'</span>);
+</pre><pre class="codeoutput">Warning: Variable names were modified to make them valid MATLAB identifiers. 
+Warning: Variable names were modified to make them valid MATLAB identifiers. 
+Warning: Variable names were modified to make them valid MATLAB identifiers. 
+Warning: Variable names were modified to make them valid MATLAB identifiers. 
+Warning: Variable names were modified to make them valid MATLAB identifiers. 
+Warning: Variable names were modified to make them valid MATLAB identifiers. 
+Warning: Variable names were modified to make them valid MATLAB identifiers. 
+Warning: Variable names were modified to make them valid MATLAB identifiers. 
+</pre><pre class="codeinput"><span class="comment">%Certain countries appear to have no World Bank data. These seem to be</span>
+<span class="comment">%mostly small island nations or other countries with a very small</span>
+<span class="comment">%population. This code identifies them and removes them from the analysis.</span>
+
+<span class="comment">%Neonatal Mortality</span>
+<span class="comment">%columns 35-60 if all are empty</span>
+years = 1960:2015;
+yearsStr = {};
+<span class="keyword">for</span> i = 1:numel(years),
+    yearsStr{i} = strcat(<span class="string">'x'</span>,num2str(years(i)));
+<span class="keyword">end</span>
+temp = [];
+<span class="keyword">for</span> i = 1:248,
+    sum = 0;
+    <span class="keyword">for</span> j = 1:56,
+        <span class="keyword">if</span> isnan(NeonatalMortality{i,yearsStr(j)}) == 1,
+            sum = sum+1;
+
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    <span class="keyword">if</span> sum == 56,
+        temp = [temp i];
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">%Identify by hand data for groupings of countries</span>
+temp = [temp 6 35 47 59 60 61 62 65 70 71 91 94 120 126 127 128 131 132 <span class="keyword">...</span>
+    144 152 161 168 172 173 175 187 193 204 206 207 232 242];
+temp = sort(temp);
+temp = unique(temp);
+countries = NeonatalMortality(temp,<span class="string">'CountryCode'</span>);
+EditNM = NeonatalMortality;
+
+EditGNI = GniData;
+EditLR = LiteracyRate;
+EditND = NursDensity;
+EditPD = PhysDensity;
+EditPop = PopulationData;
+EditSan = SanitationData;
+EditWE = WomenEmployed;
+<span class="comment">%Remove countries without data or rows for groupings of countries</span>
+EditNM(temp,:) = [];
+EditGNI(temp,:) = [];
+EditLR(temp,:) = [];
+EditND(temp,:) = [];
+EditPD(temp,:) = [];
+EditPop(temp,:) = [];
+EditSan(temp,:) = [];
+EditWE(temp,:) = [];
+</pre><p>EditedData = {EditGNI, EditLR, EditND, EditNM, EditPD, ...     EditPop, EditSan, EditWE}; for i = 1:numel(EditedData),     [m n] = size(EditedData{i});     for j = 31:56,         for k = 1:m,             if isnan(EditedData{i{m,yearsStr{j}}} == 1,</p><pre class="codeinput">EditedData = {EditGNI, EditLR, EditND, EditNM, EditPD, <span class="keyword">...</span>
+     EditPop, EditSan, EditWE};
+Titles = {<span class="string">'Gross National Income by Country in 2010'</span>,<span class="string">'Literacy Rate by Country in 2010'</span>, <span class="keyword">...</span>
+    <span class="string">'Density of Nurses by Country in 2010'</span>, <span class="string">'Neonatal Mortality Rate by Country in 2010'</span>,<span class="keyword">...</span>
+    <span class="string">'Density of Physicians by Country in 2010'</span>,<span class="string">'Population Density by Country in 2010'</span>,<span class="keyword">...</span>
+    <span class="string">'Access to Improved Sanitation by Country in 2010'</span><span class="keyword">...</span>
+    <span class="string">'Female Employment by Country in 2010'</span>};
+XLabels = {<span class="string">'Gross National Income (US Dollars)'</span>,<span class="string">'Adult Literacy Rate (%)'</span>,<span class="keyword">...</span>
+    <span class="string">'Nurses and Midwives (per 1000 people)'</span>,<span class="string">'Neonatal Mortality Rate (per 1000 live births'</span>,<span class="keyword">...</span>
+    <span class="string">'Density of Physicians (per 1000 people)'</span>,<span class="string">'Total Population'</span>,<span class="string">'Access to Improved Sanitation (%)'</span><span class="keyword">...</span>
+    <span class="string">'Percent of Female Population Employed'</span>};
+<span class="keyword">for</span> i = 1:numel(EditedData),
+    figure;
+    x = EditedData{i};
+    histogram(x{:,<span class="string">'x2010'</span>},15);
+    title(Titles{i});
+    xlabel(XLabels{i});
+    ylabel(<span class="string">'Number of Countries'</span>);
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="CourseProject_01.png" alt=""> <img vspace="5" hspace="5" src="CourseProject_02.png" alt=""> <img vspace="5" hspace="5" src="CourseProject_03.png" alt=""> <img vspace="5" hspace="5" src="CourseProject_04.png" alt=""> <img vspace="5" hspace="5" src="CourseProject_05.png" alt=""> <img vspace="5" hspace="5" src="CourseProject_06.png" alt=""> <img vspace="5" hspace="5" src="CourseProject_07.png" alt=""> <img vspace="5" hspace="5" src="CourseProject_08.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%Tamar Feldman, Biol419, Interim Report 03.03.16
+
+%I pulled the datasets I want to work with into Matlab.  There were
+%immediately apparent issues with the data, some of which I have already
+%addressed. Firstly, the World Bank includes data for groupings of
+%countries without a simple way of sorting them from the list of countries.
+% I removed these by hand as well as the empty rows for certain small
+% states like Aruba and American Samoa.  Secondly, there are large gaps in
+% the data that vary between countries and between datasets.  I have not
+% yet decided how to handle these discrepencies without misrepresenting the
+% data.  Currently, I am considering choosing a 5 year range to average
+% available values over. I could also try to identify which years have the
+% most complete data across all the indicators and include only those years
+% in my analysis.  Another approach would be to identify countries that
+% have the most complete data for analysis. This approach would need to be
+% done carefully because countries with better health usually have the most
+% complete data.  I might loose subtleties in the data if the countries
+% aren't representative of the distribution in each indicator.
+
+%I chose to visualize the data by simply creating histograms for the data
+%in 2010 to get a prelimary feel for the distributions.  I would like my
+%analysis to either span several years or look at how change in the
+%indicators from year to year is reflected in change in neonatal mortality.
+%I will also need to consider how indicators with clear outliers, like
+%population density and GNI, should be analyzed.  There might also be some
+%interesting geographical trends that I would like to explore. I think that
+%I might find some indicators to be better predictors in one region versus
+%another.  Displaying the data by region could yield insight on this.
+
+%Reading in data http://data.worldbank.org/indicator/SH.STA.ACSN
+SanitationData = readtable('SanitationData.xls');
+%http://data.worldbank.org/indicator/SE.ADT.LITR.ZS
+LiteracyRate = readtable('LiteractyRate.xls');
+%http://data.worldbank.org/indicator/SP.POP.TOTL
+PopulationData = readtable('PopulationData.xls');
+%http://data.worldbank.org/indicator/NY.GNP.ATLS.CD
+GniData = readtable('GNIData.xls');
+%http://data.worldbank.org/indicator/SH.DYN.NMRT
+NeonatalMortality = readtable('NeonatalMortality.xls');
+WomenEmployed = readtable('WomenEmployed.xls');
+PhysDensity = readtable('PhysicianDensity.xls');
+NursDensity = readtable('NursesDensity.xls');
+
+%%
+%Certain countries appear to have no World Bank data. These seem to be
+%mostly small island nations or other countries with a very small
+%population. This code identifies them and removes them from the analysis.
+
+%Neonatal Mortality
+%columns 35-60 if all are empty
+years = 1960:2015;
+yearsStr = {};
+for i = 1:numel(years),
+    yearsStr{i} = strcat('x',num2str(years(i)));
+end
+temp = [];
+for i = 1:248,
+    sum = 0;
+    for j = 1:56,
+        if isnan(NeonatalMortality{i,yearsStr(j)}) == 1,
+            sum = sum+1;
+            
+        end
+    end
+    if sum == 56,
+        temp = [temp i];
+    end
+end
+%Identify by hand data for groupings of countries
+temp = [temp 6 35 47 59 60 61 62 65 70 71 91 94 120 126 127 128 131 132 ...
+    144 152 161 168 172 173 175 187 193 204 206 207 232 242];
+temp = sort(temp);
+temp = unique(temp);
+countries = NeonatalMortality(temp,'CountryCode');
+EditNM = NeonatalMortality;
+
+EditGNI = GniData;
+EditLR = LiteracyRate;
+EditND = NursDensity;
+EditPD = PhysDensity;
+EditPop = PopulationData;
+EditSan = SanitationData;
+EditWE = WomenEmployed;
+%Remove countries without data or rows for groupings of countries
+EditNM(temp,:) = [];
+EditGNI(temp,:) = [];
+EditLR(temp,:) = [];
+EditND(temp,:) = [];
+EditPD(temp,:) = [];
+EditPop(temp,:) = [];
+EditSan(temp,:) = [];
+EditWE(temp,:) = [];
+%%
+% EditedData = {EditGNI, EditLR, EditND, EditNM, EditPD, ... 
+%     EditPop, EditSan, EditWE};
+% for i = 1:numel(EditedData),
+%     [m n] = size(EditedData{i});
+%     for j = 31:56,
+%         for k = 1:m,
+%             if isnan(EditedData{i{m,yearsStr{j}}} == 1,
+
+%% 
+EditedData = {EditGNI, EditLR, EditND, EditNM, EditPD, ... 
+     EditPop, EditSan, EditWE};
+Titles = {'Gross National Income by Country in 2010','Literacy Rate by Country in 2010', ...
+    'Density of Nurses by Country in 2010', 'Neonatal Mortality Rate by Country in 2010',...
+    'Density of Physicians by Country in 2010','Population Density by Country in 2010',...
+    'Access to Improved Sanitation by Country in 2010'...
+    'Female Employment by Country in 2010'};
+XLabels = {'Gross National Income (US Dollars)','Adult Literacy Rate (%)',...
+    'Nurses and Midwives (per 1000 people)','Neonatal Mortality Rate (per 1000 live births',...
+    'Density of Physicians (per 1000 people)','Total Population','Access to Improved Sanitation (%)'...
+    'Percent of Female Population Employed'};
+for i = 1:numel(EditedData),
+    figure;
+    x = EditedData{i};
+    histogram(x{:,'x2010'},15);
+    title(Titles{i});
+    xlabel(XLabels{i});
+    ylabel('Number of Countries');
+end
+
+
+
+
+##### SOURCE END #####
+--></body></html>
