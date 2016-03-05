@@ -91,13 +91,26 @@ EditPop(temp,:) = [];
 EditSan(temp,:) = [];
 EditWE(temp,:) = [];
 %%
-% EditedData = {EditGNI, EditLR, EditND, EditNM, EditPD, ... 
-%     EditPop, EditSan, EditWE};
-% for i = 1:numel(EditedData),
-%     [m n] = size(EditedData{i});
-%     for j = 31:56,
-%         for k = 1:m,
-%             if isnan(EditedData{i{m,yearsStr{j}}} == 1,
+%Identifies how many countries there are without data for every year
+%1990-2015 in each dataset
+EditedData = {EditGNI, EditLR, EditND, EditNM, EditPD, ... 
+    EditPop, EditSan, EditWE};
+emptyYears = zeros(8,26);
+sum = 0;
+chooseYears = yearsStr(31:56);
+for i = 1:numel(EditedData),
+    [m n] = size(EditedData{i});
+    currentData = EditedData{i};
+    for j = 1:26,
+        
+        for k = 1:m,
+            if isnan(currentData{k,chooseYears{j}}) == 1,
+                emptyYears(i,j) = emptyYears(i,j) + 1;
+            end
+        end
+
+    end
+end
 
 %% 
 EditedData = {EditGNI, EditLR, EditND, EditNM, EditPD, ... 
@@ -120,5 +133,6 @@ for i = 1:numel(EditedData),
     ylabel('Number of Countries');
 end
 
+%%
 
 

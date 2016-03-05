@@ -1,19 +1,21 @@
 %Tamar Feldman, Biol419, Interim Report 03.03.16
+
 %I pulled the datasets I want to work with into Matlab.  There were
 %immediately apparent issues with the data, some of which I have already
 %addressed. Firstly, the World Bank includes data for groupings of
 %countries without a simple way of sorting them from the list of countries.
-% I removed these by hand as well as the empty rows for certain small states
-% like Aruba and American Samoa.  Secondly, there are large gaps in the
-% data that vary between countries and between datasets.  I have not yet
-% decided how to handle these discrepencies without misrepresenting the
+% I removed these by hand as well as the empty rows for certain small
+% states like Aruba and American Samoa.  Secondly, there are large gaps in
+% the data that vary between countries and between datasets.  I have not
+% yet decided how to handle these discrepencies without misrepresenting the
 % data.  Currently, I am considering choosing a 5 year range to average
 % available values over. I could also try to identify which years have the
 % most complete data across all the indicators and include only those years
 % in my analysis.  Another approach would be to identify countries that
 % have the most complete data for analysis. This approach would need to be
-% done carefully because countries with better health usually perform well
-% in the other indicators
+% done carefully because countries with better health usually have the most
+% complete data.  I might loose subtleties in the data if the countries
+% aren't representative of the distribution in each indicator.
 
 %I chose to visualize the data by simply creating histograms for the data
 %in 2010 to get a prelimary feel for the distributions.  I would like my
@@ -89,13 +91,25 @@ EditPop(temp,:) = [];
 EditSan(temp,:) = [];
 EditWE(temp,:) = [];
 %%
-% EditedData = {EditGNI, EditLR, EditND, EditNM, EditPD, ... 
-%     EditPop, EditSan, EditWE};
-% for i = 1:numel(EditedData),
-%     [m n] = size(EditedData{i});
-%     for j = 31:56,
-%         for k = 1:m,
-%             if isnan(EditedData{i{m,yearsStr{j}}} == 1,
+EditedData = {EditGNI, EditLR, EditND, EditNM, EditPD, ... 
+    EditPop, EditSan, EditWE};
+emptyYears = zeros(8,26);
+sum = 0;
+chooseYears = yearsStr(31:56);
+for i = 1:numel(EditedData),
+    [m n] = size(EditedData{i});
+    currentData = EditedData{i};
+    for j = 1:26,
+        
+        for k = 1:m,
+            if isnan(currentData{m,chooseYears{j}}) == 1,
+                sum = sum+1;
+            end
+        end
+        emptyYears(i,j) = sum;
+        sum = 0;
+    end
+end
 
 %% 
 EditedData = {EditGNI, EditLR, EditND, EditNM, EditPD, ... 
@@ -118,5 +132,6 @@ for i = 1:numel(EditedData),
     ylabel('Number of Countries');
 end
 
+%%
 
 
