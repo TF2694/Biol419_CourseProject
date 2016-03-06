@@ -90,6 +90,7 @@ EditPD(temp,:) = [];
 EditPop(temp,:) = [];
 EditSan(temp,:) = [];
 EditWE(temp,:) = [];
+clear sum;
 %%
 %Identifies how many countries there are without data for every year
 %1990-2015 in each dataset
@@ -111,9 +112,39 @@ for i = 1:numel(EditedData),
 
     end
 end
+clear sum;
+worstYears = sum(emptyYears);
+%Exclude 2015 for which there is double the amount of missing data
+worstData = sum(emptyYears(:,1:25),2);
+%%
+%Finding countries with most complete data
+emptyCountry = zeros(193,8);
+for i = 1:numel(EditedData),
+    [m n] = size(EditedData{i});
+    x = EditedData{i};
+    for j = 1:m,
+        for k = 1:numel(chooseYears)-1,
+            if isnan(x{j,chooseYears{k}}) == 1,
+                emptyCountry(j,i) = emptyCountry(j,i) + 1;
+            end
+        end
+    end         
+end
+worstCountry = sum(emptyCountry,2);
+%%
 
-%% 
-EditedData = {EditGNI, EditLR, EditND, EditNM, EditPD, ... 
+I = imagesc(emptyCountry)
+ax1 = gca;
+ax1.XTickLabel = {'GNI','Literacy','Nurse Density',...
+    'Neonatal Mortality','Physician Density','Population Density','Improved Sanitation',...
+    'Females Employed'};
+ax1.XTickLabelRotation = 45;
+ax1.YTickLabel = {'','','','','','','',''}
+ylabel('Country');
+title('Number of Missing Data Points by Country');
+
+%%            
+EditedData = {EditGNI, EditLR, EditND, EditNM, EditPD, ...
      EditPop, EditSan, EditWE};
 Titles = {'Gross National Income by Country in 2010','Literacy Rate by Country in 2010', ...
     'Density of Nurses by Country in 2010', 'Neonatal Mortality Rate by Country in 2010',...
@@ -133,6 +164,6 @@ for i = 1:numel(EditedData),
     ylabel('Number of Countries');
 end
 
-%%
+
 
 
