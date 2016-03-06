@@ -132,8 +132,9 @@ for i = 1:numel(EditedData),
 end
 worstCountry = sum(emptyCountry,2);
 %%
-
-I = imagesc(emptyCountry)
+%Missing data by country
+figure;
+imagesc(emptyCountry)
 ax1 = gca;
 ax1.XTickLabel = {'GNI','Literacy','Nurse Density',...
     'Neonatal Mortality','Physician Density','Population Density','Improved Sanitation',...
@@ -142,7 +143,18 @@ ax1.XTickLabelRotation = 45;
 ax1.YTickLabel = {'','','','','','','',''}
 ylabel('Country');
 title('Number of Missing Data Points by Country');
-
+%% 
+%Missing data by year
+figure;
+imagesc(emptyYears);
+ax2 = gca;
+ax2.YTickLabel = {'GNI','Literacy','Nurse Density',...
+    'Neonatal Mortality','Physician Density','Population Density','Improved Sanitation',...
+    'Females Employed'};
+ax2.YTickLabelRotation = 45;
+ax2.XTickLabel = {'1994','1999','2004','2009','2014'}
+xlabel('Year');
+title('Number of Countries Without Data by Year');
 %%            
 EditedData = {EditGNI, EditLR, EditND, EditNM, EditPD, ...
      EditPop, EditSan, EditWE};
