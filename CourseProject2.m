@@ -220,17 +220,22 @@ crossval = mean(predictedclasses == p1)
 predclas = cell(size(X,3),size(X,2));
 crossval = NaN(size(X,3),size(X,2));
 %store predicted classes in cell matrix
+trials = 100;
 for i = 1:size(X,3),
     for j = 1:size(X,2),
+        crossval1 = 0;
         IDnans = isnan(X(:,j,i));
         Idxnans = find(IDnans);
         p1 = Percentiles(:,j);
         p1(Idxnans) = [];
         currentIn = X(:,j,i);
         currentIn(Idxnans) = [];
-        predictedclasses = classify(currentIn, currentIn,p1);
-        predclas{i,j} = predictedclasses;
-        crossval(i,j) = mean(predictedclasses == p1);
+        for k = 1:trials,
+            predictedclasses = classify(currentIn, currentIn,p1);
+            predclas{i,j} = predictedclasses;
+            crossval1 = crossval1 + mean(predictedclasses == p1);
+        end
+        crossval(i,j) = crossval1/trials;
     end
 end
 crossval = vertcat(crossval(1:3,:), crossval(5:size(crossval,1),:));

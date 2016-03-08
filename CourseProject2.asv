@@ -202,14 +202,50 @@ end
 %First, identify the NaNs. These mess up the classifer because they change
 %the effective dimensions of the training matrix, disrupting how the known
 %labels are applied.
-IDnans = isnan(X(:,:,1));
+IDnans = isnan(X(:,1,1));
 %find the indices where isnan = 1
 Idxnans = find(IDnans);
 %delete these rows in a copy of the percentiles matrix
 p1 = Percentiles(:,1);
 p1(Idxnans) = [];
 %delete NaNs from a copy of the indicator data for that year
-currentIn = X(:,:,1);
+currentIn = X(:,1,1);
 currentIn(Idxnans) = [];
 %run the classifier
 predictedclasses = classify(currentIn, currentIn,p1);
+%cross validate
+crossval = mean(predictedclasses == p1)
+%store cross val in matrix for plotting
+%all predicted classes go here for storage
+predclas = cell(size(X,3),size(X,2));
+crossval = NaN(size(X,3),size(X,2));
+%store predicted classes in cell matrix
+trials = 1000;
+for i = 1:size(X,3),
+    for j = 1:size(X,2),
+        crossval1 = 0;
+        IDnans = isnan(X(:,j,i));
+        Idxnans = find(IDnans);
+        p1 = Percentiles(:,j);
+        p1(Idxnans) = [];
+        currentIn = X(:,j,i);
+        currentIn(Idxnans) = [];
+        for k = 1:trials,
+            predictedclasses = classify(currentIn, currentIn,p1);
+            predclas{i,j} = predictedclasses;
+            crossval1 = crossval1 + mean(predictedclasses == p1);
+        end
+        crossval(i,j) = crossval1/trials;
+    end
+end
+crossval = vertcat(crossval(1:3,:), crossval(5:size(crossval,1),:));
+Time = 2000:2010;
+figure;
+for i = 1:size(crossval,1),
+    subplot(3,3,i);
+    plot(Time,crossval(i,:));
+    axis([2000 2010 0 1])
+    a1 = gca;
+    a1.XMinorTick = 'on';
+    a1.YMinorTick = 'on';
+end
