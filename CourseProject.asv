@@ -37,10 +37,14 @@ PopulationData = readtable('PopulationData.xls');
 GniData = readtable('GNIData.xls');
 %http://data.worldbank.org/indicator/SH.DYN.NMRT
 NeonatalMortality = readtable('NeonatalMortality.xls');
+
 WomenEmployed = readtable('WomenEmployed.xls');
 PhysDensity = readtable('PhysicianDensity.xls');
 NursDensity = readtable('NursesDensity.xls');
-
+%
+HospitalBeds = readtable('HospitalBeds.xls');
+%http://data.worldbank.org/indicator/SH.XPD.PUBL
+HealthSpending = readtable('HealthSpending.xls');
 %%
 %Certain countries appear to have no World Bank data. These seem to be
 %mostly small island nations or other countries with a very small
@@ -81,6 +85,8 @@ EditPD = PhysDensity;
 EditPop = PopulationData;
 EditSan = SanitationData;
 EditWE = WomenEmployed;
+EditHB = HospitalBeds;
+EditHS = HealthSpending;
 %Remove countries without data or rows for groupings of countries
 EditNM(temp,:) = [];
 EditGNI(temp,:) = [];
@@ -90,13 +96,15 @@ EditPD(temp,:) = [];
 EditPop(temp,:) = [];
 EditSan(temp,:) = [];
 EditWE(temp,:) = [];
+EditHB(temp,:) = [];
+EditHS(temp,:) = [];
 clear sum;
 %%
 %Identifies how many countries there are without data for every year
 %1990-2015 in each dataset
 EditedData = {EditGNI, EditLR, EditND, EditNM, EditPD, ... 
-    EditPop, EditSan, EditWE};
-emptyYears = zeros(8,26);
+    EditPop, EditSan, EditWE,EditHB,EditHS};
+emptyYears = zeros(numel(EditedData),26);
 sum = 0;
 chooseYears = yearsStr(31:56);
 for i = 1:numel(EditedData),
@@ -118,7 +126,7 @@ worstYears = sum(emptyYears);
 worstData = sum(emptyYears(:,1:25),2);
 %%
 %Finding countries with most complete data
-emptyCountry = zeros(193,8);
+emptyCountry = zeros(193,numel(EditedData));
 for i = 1:numel(EditedData),
     [m n] = size(EditedData{i});
     x = EditedData{i};
@@ -135,38 +143,40 @@ worstCountry = sum(emptyCountry,2);
 %Missing data by country
 figure;
 imagesc(emptyCountry)
+colorbar;
 ax1 = gca;
 ax1.XTickLabel = {'GNI','Literacy','Nurse Density',...
     'Neonatal Mortality','Physician Density','Population Density','Improved Sanitation',...
-    'Females Employed'};
+    'Females Employed','Hospital Beds','Health Spending'};
 ax1.XTickLabelRotation = 45;
-ax1.YTickLabel = {'','','','','','','',''}
+ax1.YTickLabel = {''};
 ylabel('Country');
 title('Number of Missing Data Points by Country');
 %% 
 %Missing data by year
 figure;
 imagesc(emptyYears);
+colorbar;
 ax2 = gca;
 ax2.YTickLabel = {'GNI','Literacy','Nurse Density',...
     'Neonatal Mortality','Physician Density','Population Density','Improved Sanitation',...
-    'Females Employed'};
+    'Females Employed','Hospital Beds','Health Spending'};
 ax2.YTickLabelRotation = 45;
-ax2.XTickLabel = {'1994','199
+ax2.XTickLabel = {'1994','1999','2004','2009','2014'};
 xlabel('Year');
-title('Number of Missing Data Points by Year');
+title('Number of Countries Without Data by Year');
 %%            
 EditedData = {EditGNI, EditLR, EditND, EditNM, EditPD, ...
-     EditPop, EditSan, EditWE};
+     EditPop, EditSan, EditWE, EditHB,EditHS};
 Titles = {'Gross National Income by Country in 2010','Literacy Rate by Country in 2010', ...
     'Density of Nurses by Country in 2010', 'Neonatal Mortality Rate by Country in 2010',...
     'Density of Physicians by Country in 2010','Population Density by Country in 2010',...
     'Access to Improved Sanitation by Country in 2010'...
-    'Female Employment by Country in 2010'};
+    'Female Employment by Country in 2010','Hospital Beds 2010','Health Spending in 2010'};
 XLabels = {'Gross National Income (US Dollars)','Adult Literacy Rate (%)',...
     'Nurses and Midwives (per 1000 people)','Neonatal Mortality Rate (per 1000 live births',...
     'Density of Physicians (per 1000 people)','Total Population','Access to Improved Sanitation (%)'...
-    'Percent of Female Population Employed'};
+    'Percent of Female Population Employed','Hosptial Beds (per 1000)','Health Expenditure. public (% of total)'};
 for i = 1:numel(EditedData),
     figure;
     x = EditedData{i};

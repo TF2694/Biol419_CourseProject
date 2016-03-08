@@ -27,7 +27,7 @@
 %I might find some indicators to be better predictors in one region versus
 %another.  Displaying the data by region could yield insight on this.
 
-%Reading in data http://data.worldbank.org/indicator/SH.STA.ACSN
+%http://data.worldbank.org/indicator/SH.STA.ACSN
 SanitationData = readtable('SanitationData.xls');
 %http://data.worldbank.org/indicator/SE.ADT.LITR.ZS
 LiteracyRate = readtable('LiteractyRate.xls');
@@ -37,10 +37,15 @@ PopulationData = readtable('PopulationData.xls');
 GniData = readtable('GNIData.xls');
 %http://data.worldbank.org/indicator/SH.DYN.NMRT
 NeonatalMortality = readtable('NeonatalMortality.xls');
+%http://data.worldbank.org/indicator/SL.TLF.ACTI.FE.ZS
 WomenEmployed = readtable('WomenEmployed.xls');
+%http://data.worldbank.org/indicator/SH.MED.PHYS.ZS
 PhysDensity = readtable('PhysicianDensity.xls');
+%http://data.worldbank.org/indicator/SH.MED.NUMW.P3
 NursDensity = readtable('NursesDensity.xls');
+%http://data.worldbank.org/indicator/SH.MED.BEDS.ZS
 HospitalBeds = readtable('HospitalBeds.xls');
+%http://data.worldbank.org/indicator/SH.XPD.PUBL
 HealthSpending = readtable('HealthSpending.xls');
 %%
 %Certain countries appear to have no World Bank data. These seem to be
@@ -159,7 +164,7 @@ ax2.YTickLabel = {'GNI','Literacy','Nurse Density',...
     'Neonatal Mortality','Physician Density','Population Density','Improved Sanitation',...
     'Females Employed','Hospital Beds','Health Spending'};
 ax2.YTickLabelRotation = 45;
-ax2.XTickLabel = {'1994','1999','2004','2009','2014'}
+ax2.XTickLabel = {'1994','1999','2004','2009','2014'};
 xlabel('Year');
 title('Number of Countries Without Data by Year');
 %%            
