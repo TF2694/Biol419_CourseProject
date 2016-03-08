@@ -104,7 +104,7 @@ clear sum;
 %%
 %Identifies how many countries there are without data for every year
 %1990-2015 in each dataset
-EditedData = {EditGNI, EditLR, EditND, EditNM, EditPD, ... 
+EditedData = {EditGNI, EditLR, EditNM, EditPD, ... 
     EditPop, EditSan, EditWE,EditHB,EditHS};
 emptyYears = zeros(numel(EditedData),26);
 sum = 0;
@@ -192,10 +192,29 @@ end
 %just the best predictor for that year.
 
 %First, remove 2000 to 2010 from the data sets and store separately
-%(country,year,dataset)
+%X = (country,year,dataset)
 X = zeros(m,11,numel(EditedData));
 for i = 1:numel(EditedData),
-    x = Edite
-    X(:,:,EditedData
-
+    x = EditedData{i};
+    X(:,:,i) = x{:,45:55};
+end
+%Second, calculate the change between years and store
+Xchange = NaN(m,10,numel(EditedData));
+[n1] = size(X,2);
+for i = 1:numel(EditedData),
+    for j = 1:(n1 - 1),
+    Xchange(:,j,i) = X(:,j+1,i) - X(:,j,i);
+    end
+end
 %% PCA analysis for each year, plots of PCA with coloring by NM
+COEFFcell = {};
+latentcell = {};
+explainedcell = {};
+for i = 5:(n1-1),
+    Blah = squeeze(X(:,i,:));
+    S = corrcoef(Blah,'rows','pairwise');
+    [COEFF,latent,explained] = pcacov(S);
+    COEFFcell{i} = COEFF;
+    latentcell{i} = latent;
+    explainedcell{i} = explained;
+end
