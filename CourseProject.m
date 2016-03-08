@@ -218,4 +218,3 @@ for i = 1:(n1-1),
     latentcell{i} = latent;
     explainedcell{i} = explained;
 end
-
