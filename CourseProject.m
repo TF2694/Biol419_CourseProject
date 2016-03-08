@@ -187,7 +187,23 @@ for i = 1:numel(EditedData),
     xlabel(XLabels{i});
     ylabel('Number of Countries');
 end
+%% Calculating change between years from 2000 to 2010
+%time points to check that the indicator is reliable over a decade, not
+%just the best predictor for that year.
 
-
-
-
+%First, remove 2000 to 2010 from the data sets and store separately
+%X = (country,year,dataset)
+X = zeros(m,11,numel(EditedData));
+for i = 1:numel(EditedData),
+    x = EditedData{i};
+    X(:,:,i) = x{:,45:55};
+end
+%Second, calculate the change between years and store
+Xchange = NaN(m,10,numel(EditedData));
+[n1] = size(X,2);
+for i = 1:numel(EditedData),
+    for j = 1:(n1 - 1),
+    Xchange(:,j,i) = X(:,j+1,i) - X(:,j,i);
+    end
+end
+%% PCA analysis for each year, plots of PCA with coloring by NM
