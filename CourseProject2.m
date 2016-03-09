@@ -220,7 +220,7 @@ crossval = mean(predictedclasses == p1)
 predclas = cell(size(X,3),size(X,2));
 crossval = NaN(size(X,3),size(X,2));
 %store predicted classes in cell matrix
-trials = 100;
+trials = 1;
 for i = 1:size(X,3),
     for j = 1:size(X,2),
         crossval1 = 0;
@@ -241,11 +241,49 @@ end
 crossval = vertcat(crossval(1:3,:), crossval(5:size(crossval,1),:));
 Time = 2000:2010;
 figure;
+Title2 = {'GNI','Literacy Rate', ...
+    'Density of Nurses',...
+    'Density of Physicians','Population Density',...
+    'Access to Improved Sanitation'...
+    'Percent of Females Employed','Hospital Beds (per 1000 people)','Health expenditure,public (% of total)'};
 for i = 1:size(crossval,1),
     subplot(3,3,i);
     plot(Time,crossval(i,:));
+    title(Title2{i});
     axis([2000 2010 0 1])
     a1 = gca;
     a1.XMinorTick = 'on';
     a1.YMinorTick = 'on';
+    xlabel('Year');
+    ylabel('Cross-validated accuracy')
 end
+suptitle('Mean Cross-Validated Accuracy (n = 100) for LDA Classifiers Predicting Neonatal Mortality');
+%%
+IS = squeeze(X(:,:,7));
+HS = squeeze(X(:,:,10));
+p2 = Percentiles;
+%store predicted classes in cell matrix
+for i = 1:11,
+    Nantime = isnan(IS(:,i));
+    nonans = find(Nantime);
+    p2(nonans,:) = [];
+    IS(nonans,:) = [];
+    HS(nonans,:) = [];
+end
+for i = 1:11,
+    Nantime = isnan(HS(:,i));
+    nonans = find(Nantime);
+    p2(nonans,:) = [];
+    IS(nonans,:) = [];
+    HS(nonans,:) = [];
+end
+
+ISHS = cat(3,IS,HS);
+ISHS = squeeze(ISHS(:,1,:));
+predictedclasses = classify(ISHS,ISHS,p2(:,1))
+crossval = mean(predictedclasses == p2(:,1))
+%%
+figure;
+histogram(X(:,1,7),10);
+hold on;
+histogram(X(:,11,7),10);
