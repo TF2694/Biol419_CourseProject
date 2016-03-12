@@ -178,7 +178,6 @@ for i = 1:numel(EditedData),
     end
 end
 %% LDA for health
-
 Y25 = prctile(X(:,:,4),25);
 Y50 = prctile(X(:,:,4),50);
 Y75 = prctile(X(:,:,4),75);
@@ -220,7 +219,10 @@ crossval = mean(predictedclasses == p1)
 predclas = cell(size(X,3),size(X,2));
 crossval = NaN(size(X,3),size(X,2));
 %store predicted classes in cell matrix
-trials = 1;
+trials = 1000;
+%fraction of dataset to test with
+testfrac = 0.2;
+
 for i = 1:size(X,3),
     for j = 1:size(X,2),
         crossval1 = 0;
@@ -230,10 +232,14 @@ for i = 1:size(X,3),
         p1(Idxnans) = [];
         currentIn = X(:,j,i);
         currentIn(Idxnans) = [];
+      
         for k = 1:trials,
-            predictedclasses = classify(currentIn, currentIn,p1);
+            permuted = randperm(numel(currentIn));
+            test = permuted(1:floor(numel(currentIn)*testfrac));
+            train = permuted(ceil((numel(currentIn)*testfrac)):end);
+            predictedclasses = classify(currentIn(test), currentIn(train),p1(train));
             predclas{i,j} = predictedclasses;
-            crossval1 = crossval1 + mean(predictedclasses == p1);
+            crossval1 = crossval1 + mean(predictedclasses == p1(test));
         end
         crossval(i,j) = crossval1/trials;
     end
