@@ -275,14 +275,13 @@ histogram(X(:,11,7),10);
 %Making a multi-variate classifier with sanitation and public health
 %expenditure
 %delete the NaNs for both indicators
-p2 = Percentiles;
 ISHS = cat(3,X(:,:,7),X(:,:,10));
 [row col] = find(isnan(ISHS(:,:,1)));
 row = unique(row);
-p2(row,:) = [];
+p1(row) = [];
 ISHS(row,:,:) = [];
 [row col] = find(isnan(ISHS(:,:,2)));
 row = unique(row);
-p2(row,:) = [];
+p1(row) = [];
 ISHS(row,:,:) = [];
-
+ISHS(row,:,:) = [];
