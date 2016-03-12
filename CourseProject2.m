@@ -285,4 +285,15 @@ ISHS(row,:,:) = [];
 row = unique(row);
 p2(row,:) = [];
 ISHS(row,:,:) = [];
+ISHS_rows = size(ISHS,1);
+ISHS_year = squeeze(ISHS(:,1,:));
+cvatotal = 0;
 
+for k = 1:trials,
+    permuted = randperm(ISHS_rows);
+    test = permuted(1:floor(ISHS_rows*testfrac));
+    train = permuted(ceil((ISHS_rows*testfrac)):end);
+    predictedclasses = classify(ISHS_year(test,:), ISHS_year(train,:),p2(train));
+    cvatotal = cvatotal + mean(predictedclasses == p2(test)');
+end
+cvatotal/trials
