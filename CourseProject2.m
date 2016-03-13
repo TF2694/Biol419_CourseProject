@@ -139,8 +139,6 @@ ax2.XTickLabel = {'1994','1999','2004','2009','2014'};
 xlabel('Year');
 title('Number of Countries Without Data by Year');
 %%            
-EditedData = {EditGNI, EditLR, EditND, EditNM, EditPD, ...
-     EditPop, EditSan, EditWE, EditHB,EditHS};
 Titles = {'Gross National Income by Country in 2010','Literacy Rate by Country in 2010', ...
     'Density of Nurses by Country in 2010', 'Neonatal Mortality Rate by Country in 2010',...
     'Density of Physicians by Country in 2010','Population Density by Country in 2010',...
@@ -210,16 +208,11 @@ p1(Idxnans) = [];
 %delete NaNs from a copy of the indicator data for that year
 currentIn = X(:,1,1);
 currentIn(Idxnans) = [];
-%run the classifier
-predictedclasses = classify(currentIn, currentIn,p1);
-%cross validate
-crossval = mean(predictedclasses == p1)
-%store cross val in matrix for plotting
 %all predicted classes go here for storage
 predclas = cell(size(X,3),size(X,2));
 crossval = NaN(size(X,3),size(X,2));
 %store predicted classes in cell matrix
-trials = 1000;
+trials = 100;
 %fraction of dataset to test with
 testfrac = 0.2;
 
@@ -245,6 +238,7 @@ for i = 1:size(X,3),
     end
 end
 crossval = vertcat(crossval(1:3,:), crossval(5:size(crossval,1),:));
+%%
 Time = 2000:2010;
 figure;
 Title2 = {'GNI','Literacy Rate', ...
@@ -277,23 +271,28 @@ histogram(X(:,11,7),10);
 %delete the NaNs for both indicators
 p2 = Percentiles;
 ISHS = cat(3,X(:,:,7),X(:,:,10));
-[row col] = find(isnan(ISHS(:,:,1)));
-row = unique(row);
-p2(row,:) = [];
-ISHS(row,:,:) = [];
-[row col] = find(isnan(ISHS(:,:,2)));
-row = unique(row);
-p2(row,:) = [];
-ISHS(row,:,:) = [];
-ISHS_rows = size(ISHS,1);
-ISHS_year = squeeze(ISHS(:,1,:));
-cvatotal = 0;
+crossval2 = buildclass(ISHS,p2,trials);
+%%
+figure;
+plot(Time,crossval2);
+ylim([0 1])
 
-for k = 1:trials,
-    permuted = randperm(ISHS_rows);
-    test = permuted(1:floor(ISHS_rows*testfrac));
-    train = permuted(ceil((ISHS_rows*testfrac)):end);
-    predictedclasses = classify(ISHS_year(test,:), ISHS_year(train,:),p2(train));
-    cvatotal = cvatotal + mean(predictedclasses == p2(test)');
-end
-cvatotal/trials
+figure;
+plot(ISHS(:,1,1),ISHS(:,1,2),'.');
+std(ISHS(:,1,1))
+std(ISHS(:,1,2))
+%%
+p3 = Percentiles;
+GISHS = cat(3,X(:,:,1),X(:,:,7),X(:,:,10));
+crossval3 = buildclass(GISHS,p3,trials);
+%%
+figure;
+plot(Time,crossval3);
+ylim([0 1])
+%%
+newin = cat(3,X(:,:,1),X(:,:,7),X(:,:,8),X(:,:,10));
+crossval4 = buildclass(newin,Percentiles,trials);
+%%
+figure;
+plot(Time,crossval4);
+ylim([0 1])

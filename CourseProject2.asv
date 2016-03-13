@@ -219,7 +219,7 @@ crossval = mean(predictedclasses == p1)
 predclas = cell(size(X,3),size(X,2));
 crossval = NaN(size(X,3),size(X,2));
 %store predicted classes in cell matrix
-trials = 1000;
+trials = 100;
 %fraction of dataset to test with
 testfrac = 0.2;
 
@@ -274,22 +274,28 @@ histogram(X(:,11,7),10);
 %%
 %Making a multi-variate classifier with sanitation and public health
 %expenditure
-%delete the NaNs for both indicators
-p2 = Percentiles;
 ISHS = cat(3,X(:,:,7),X(:,:,10));
-[row col] = find(isnan(ISHS(:,:,1)));
-row = unique(row);
-p2(row,:) = [];
-ISHS(row,:,:) = [];
-[row col] = find(isnan(ISHS(:,:,2)));
-row = unique(row);
-p2(row,:) = [];
-ISHS(row,:,:) = [];
-ISHS_rows = size(ISHS,1);
-for k = 1:trials,
-    permuted = randperm(ISHS_rows);
-    test = permuted(1:floor(ISHS_rows*testfrac));
-    train = permuted(ceil((ISHS_rows*testfrac)):end);
-    predictedclasses = classify(ISHS(test,:), ISHS(train,:),p2(train));
+crossval2 = buildclass(ISHS,Percentiles,trials);
+%%
+figure;
+plot(Time,crossval2);
+ylim([0 1])
 
-end
+figure;
+plot(ISHS(:,1,1),ISHS(:,1,2),'.');
+std(ISHS(:,1,1))
+std(ISHS(:,1,2))
+%%
+GISHS = cat(3,X(:,:,1),X(:,:,7),X(:,:,10));
+crossval3 = buildclass(GISHS,Percentiles,trials);
+%%
+figure;
+plot(Time,crossval3);
+ylim([0 1])
+%%
+newin = cat(3,X(:,:,1),X(:,:,7),X(:,:,8),X(:,:,10));
+crossval4 = buildclass(newin,Percentiles,trials);
+%%
+figure;
+plot(Time,crossval4);
+ylim([0 1])
