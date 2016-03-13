@@ -268,7 +268,6 @@ histogram(X(:,11,7),10);
 %%
 %Making a multi-variate classifier with sanitation and public health
 %expenditure
-%delete the NaNs for both indicators
 p2 = Percentiles;
 ISHS = cat(3,X(:,:,7),X(:,:,10));
 crossval2 = buildclass(ISHS,p2,trials);
@@ -281,7 +280,7 @@ figure;
 plot(ISHS(:,1,1),ISHS(:,1,2),'.');
 std(ISHS(:,1,1))
 std(ISHS(:,1,2))
-%%
+%%LDA for GNI, Improved Sanitation, and Public Health Expenditure
 p3 = Percentiles;
 GISHS = cat(3,X(:,:,1),X(:,:,7),X(:,:,10));
 crossval3 = buildclass(GISHS,p3,trials);
@@ -290,9 +289,37 @@ figure;
 plot(Time,crossval3);
 ylim([0 1])
 %%
+%LDA for GNI, Improved Sanitation, Female Employment, and Public Health
+%Expenditure
 newin = cat(3,X(:,:,1),X(:,:,7),X(:,:,8),X(:,:,10));
 crossval4 = buildclass(newin,Percentiles,trials);
+mean(crossval4)
 %%
 figure;
 plot(Time,crossval4);
 ylim([0 1])
+%% Sub Saharan Africa
+CLASS = readtable('CLASS.xls');
+Codes = CLASS(:,'Code');
+Africa = [];
+for i = 1:215,
+    if strcmp(CLASS{i,'Region'},'Sub-Saharan Africa') == 1,
+        Africa = [Africa i];
+    end
+end
+Codes = Codes(Africa,'Code');
+Africa2 = [];
+for i = 1:numel(Codes),
+    for j = 1:193,
+        if strcmp(EditNM{j,'CountryCode'},Codes{i,'Code'}) == 1,
+            Africa2 = [Africa2 j];
+        end
+    end
+end
+AfNM = EditNM(Africa2,:);
+AfGNI = EditNM(Africa2,:);
+AfPop = EditPop(Africa2,:);
+AfHS = EditHS(Africa2,:);
+AfSan = EditSan(Africa2,:);
+AfWE = EditWE(Africa2,:);
+AfData = {AfNM, AfGNI,AfPop,AfHS,AfSan,AfWE};
