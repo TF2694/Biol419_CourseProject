@@ -3,7 +3,7 @@ SanitationData = readtable('SanitationData.xls');
 %http://data.worldbank.org/indicator/SE.ADT.LITR.ZS
 LiteracyRate = readtable('LiteractyRate.xls');
 %http://data.worldbank.org/indicator/SP.POP.TOTL
-PopulationData = readtable('PopulationData.xls');
+PopulationData = readtable('PopDens.xls');
 %http://data.worldbank.org/indicator/NY.GNP.ATLS.CD
 GniData = readtable('GNIData.xls');
 %http://data.worldbank.org/indicator/SH.DYN.NMRT
@@ -212,7 +212,7 @@ currentIn(Idxnans) = [];
 predclas = cell(size(X,3),size(X,2));
 crossval = NaN(size(X,3),size(X,2));
 %store predicted classes in cell matrix
-trials = 100;
+trials = 1000;
 %fraction of dataset to test with
 testfrac = 0.2;
 
@@ -241,23 +241,26 @@ crossval = vertcat(crossval(1:3,:), crossval(5:size(crossval,1),:));
 %%
 Time = 2000:2010;
 figure;
-Title2 = {'GNI','Literacy Rate', ...
-    'Density of Nurses',...
-    'Density of Physicians','Population Density',...
-    'Access to Improved Sanitation'...
-    'Percent of Females Employed','Hospital Beds (per 1000 people)','Health expenditure,public (% of total)'};
+Title2 = {'GNI (US $)','Literacy Rate (% of 15+ pop.)', ...
+    'Nurses and Midwives (per 1000 people)',...
+    'Physicians (per 1000 people)','Population Density (people/km^2)',...
+    'Improved Sanitation (% of pop. with access)'...
+    'Employment, female (% of fem. ages 15-64)','Hospital Beds (per 1000 people)','Health expenditure,public (% of total)'};
 for i = 1:size(crossval,1),
     subplot(3,3,i);
     plot(Time,crossval(i,:));
     title(Title2{i});
     axis([2000 2010 0 1])
     a1 = gca;
-    a1.XMinorTick = 'on';
-    a1.YMinorTick = 'on';
-    xlabel('Year');
-    ylabel('Cross-validated accuracy')
+    a1.YTick = 0:0.2:1;
 end
-suptitle('Mean Cross-Validated Accuracy (n = 100) for LDA Classifiers Predicting Neonatal Mortality');
+suptitle('Mean Cross-Validated Accuracy (n = 1000) for LDA Classifiers Predicting Neonatal Mortality');
+a1 = axes;
+a1.Position = [0 0 1 1];
+a1.Visible = 'off';
+text(0.495,0.04,'Year','FontSize',16);
+t = text(0.04,0.35,'Cross-Validated Accuracy','FontSize',16);
+set(t,'rotation',90);
 
 
 %%
@@ -317,9 +320,153 @@ for i = 1:numel(Codes),
     end
 end
 AfNM = EditNM(Africa2,:);
-AfGNI = EditNM(Africa2,:);
+AfGNI = EditGNI(Africa2,:);
 AfPop = EditPop(Africa2,:);
 AfHS = EditHS(Africa2,:);
 AfSan = EditSan(Africa2,:);
 AfWE = EditWE(Africa2,:);
 AfData = {AfNM, AfGNI,AfPop,AfHS,AfSan,AfWE};
+%%
+%Grabbing African data for 2000 to 2010
+AX = zeros(47,11,numel(AfData));
+for i = 1:numel(AfData),
+    x = AfData{i};
+    AX(:,:,i) = x{:,45:55};
+end
+%Sort Neonatal Mortality into quartiles
+AY25 = prctile(AX(:,:,1),25);
+AY50 = prctile(AX(:,:,1),50);
+AY75 = prctile(AX(:,:,1),75);
+
+APercentiles = NaN(47,11);
+for i = 1:47,
+    for j = 1:11,
+        if AX(i,j,1)> AY75(j)
+            APercentiles(i,j) = 4;
+        elseif AX(i,j,1)> AY50(j)
+            APercentiles(i,j) = 3;
+        elseif AX(i,j,1) > AY25(j)
+            APercentiles(i,j) = 2;
+        else
+            APercentiles(i,j) = 1;
+        end
+    end
+end
+%% African LDA
+ACVA = {};
+for i = 2:numel(AfData),
+    crossval = buildclass(AX(:,:,i),APercentiles,100);
+    ACVA{i-1} = crossval;
+end
+figure;
+for i = 1:5,
+    subplot(2,3,i);
+    plot(Time,ACVA{i})
+    ylim([0 1]);
+end
+
+%%
+AY30 = prctile(AX(:,:,1),30);
+AY60 = prctile(AX(:,:,1),60);
+
+APercentiles2 = NaN(47,11);
+for i = 1:47,
+    for j = 1:11,
+        if AX(i,j,1)> AY60(j)
+            APercentiles2(i,j) = 3;
+        elseif AX(i,j,1)> AY30(j)
+            APercentiles2(i,j) = 2;
+        else
+            APercentiles2(i,j) = 1;
+        end
+    end
+end
+%%
+ACVA2 = {};
+for i = 2:numel(AfData),
+    crossval = buildclass(AX(:,:,i),APercentiles2,100);
+    ACVA2{i-1} = crossval;
+end
+figure;
+for i = 1:5,
+    subplot(2,3,i);
+    plot(Time,ACVA2{i})
+    ylim([0 1]);
+end
+%%
+AGS = cat(3,AX(:,:,2),AX(:,:,5));
+crossval5 = buildclass(AGS,APercentiles2,100);
+figure;
+plot(Time,crossval5);
+ylim([0 1]);
+%%
+A = cat(3,AX(:,:,5),AX(:,:,6));
+crossval6 = buildclass(A,APercentiles,100);
+figure;
+plot(Time,crossval6);
+ylim([0 1]);
+%% Asia
+CLASS = readtable('CLASS.xls');
+Codes = CLASS(:,'Code');
+Asia = [];
+for i = 1:215,
+    if strcmp(CLASS{i,'Region'},'South Asia') == 1,
+        Asia = [Asia i];
+    end
+    if strcmp(CLASS{i,'Region'},'East Asia & Pacific') == 1,
+        Asia = [Asia i];
+    end
+end
+Codes2 = Codes(Asia,'Code');
+Asia2 = [];
+for i = 1:numel(Codes2),
+    for j = 1:193,
+        if strcmp(EditNM{j,'CountryCode'},Codes2{i,'Code'}) == 1,
+            Asia2 = [Asia2 j];
+        end
+    end
+end
+AsNM = EditNM(Asia2,:);
+AsGNI = EditGNI(Asia2,:);
+AsPop = EditPop(Asia2,:);
+AsHS = EditHS(Asia2,:);
+AsSan = EditSan(Asia2,:);
+AsWE = EditWE(Asia2,:);
+AsData = {AsNM, AsGNI,AsPop,AsHS,AsSan,AsWE};
+%%
+AS = zeros(36,11,numel(AsData));
+for i = 1:numel(AsData),
+    x = AsData{i};
+    AS(:,:,i) = x{:,45:55};
+end
+%Sort Neonatal Mortality into quartiles
+AS25 = prctile(AS(:,:,1),25);
+AS50 = prctile(AS(:,:,1),50);
+AS75 = prctile(AS(:,:,1),75);
+
+APercentiles3 = NaN(36,11);
+for i = 1:36,
+    for j = 1:11,
+        if AS(i,j,1)> AS75(j)
+            APercentiles3(i,j) = 4;
+        elseif AS(i,j,1)> AS50(j)
+            APercentiles3(i,j) = 3;
+        elseif AS(i,j,1) > AS25(j)
+            APercentiles3(i,j) = 2;
+        else
+            APercentiles3(i,j) = 1;
+        end
+    end
+end
+%%
+AsCVA = {};
+for i = 2:numel(AsData),
+    crossval = buildclass(AS(:,:,i),APercentiles3,100);
+    AsCVA{i-1} = crossval;
+end
+figure;
+for i = 1:5,
+    subplot(2,3,i);
+    plot(Time,AsCVA{i})
+    ylim([0 1]);
+end
